@@ -1,1 +1,102 @@
-<!DOCTYPE html><html><head><title>Calculator</title><style>body{font-family:sans-serif;text-align:center;}#calculator{display:inline-block;border:1px solid #ccc;padding:10px;border-radius:5px;}input[type="button"]{width:50px;height:50px;margin:5px;}#display{width:210px;height:40px;font-size:20px;margin-bottom:10px;}</style></head><body><h1>Calculator</h1><div id="calculator"><input type="text" id="display"><br><input type="button" value="1" onclick="display.value+='1'"><input type="button" value="2" onclick="display.value+='2'"><input type="button" value="3" onclick="display.value+='3'"><input type="button" value="+" onclick="display.value+='+'"><br><input type="button" value="4" onclick="display.value+='4'"><input type="button" value="5" onclick="display.value+='5'"><input type="button" value="6" onclick="display.value+='6'"><input type="button" value="-" onclick="display.value+='-'"><br><input type="button" value="7" onclick="display.value+='7'"><input type="button" value="8" onclick="display.value+='8'"><input type="button" value="9" onclick="display.value+='9'"><input type="button" value="*" onclick="display.value+='*'"><br><input type="button" value="C" onclick="display.value=''"><input type="button" value="0" onclick="display.value+='0'"><input type="button" value="=" onclick="display.value=eval(display.value)"><input type="button" value="/" onclick="display.value+='/'"></div></body></html>
+<!DOCTYPE html>
+<html>
+<head>
+<title>React Calculator</title>
+<script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<style>
+  body { font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; background-color: #f0f0f0; margin: 0; }
+  .calculator { background-color: #fff; padding: 20px; border-radius: 10px; box-shadow: 0px 0px 10px rgba(0,0,0,0.1); }
+  .display { font-size: 2.5em; margin-bottom: 15px; padding: 15px; background-color: #222; color: #fff; text-align: right; border-radius: 5px; min-height: 1.2em; word-wrap: break-word; }
+  .buttons { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+  button { padding: 20px; font-size: 1.2em; border: none; border-radius: 5px; cursor: pointer; background-color: #e0e0e0; transition: background-color 0.2s; }
+  button:hover { background-color: #d0d0d0; }
+  .operator { background-color: #ff9f43; color: white; }
+  .operator:hover { background-color: #f39c12; }
+  .equal { background-color: #2ecc71; color: white; grid-column: span 2; }
+  .equal:hover { background-color: #27ae60; }
+  .clear { background-color: #e74c3c; color: white; }
+  .clear:hover { background-color: #c0392b; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+  function Calculator() {
+    const [display, setDisplay] = React.useState('0');
+    const [operand1, setOperand1] = React.useState(null);
+    const [operator, setOperator] = React.useState(null);
+    const [shouldResetDisplay, setShouldResetDisplay] = React.useState(false);
+
+    const handleDigit = (digit) => {
+      if (display === '0' || shouldResetDisplay) {
+        setDisplay(String(digit));
+        setShouldResetDisplay(false);
+      } else {
+        setDisplay(display + digit);
+      }
+    };
+
+    const handleOperator = (op) => {
+      if (operand1 !== null && operator !== null) {
+        handleEqual();
+      }
+      setOperand1(parseFloat(display));
+      setOperator(op);
+      setShouldResetDisplay(true);
+    };
+
+    const handleEqual = () => {
+      if (operand1 === null || operator === null) return;
+      const operand2 = parseFloat(display);
+      let result;
+      switch (operator) {
+        case '+': result = operand1 + operand2; break;
+        case '-': result = operand1 - operand2; break;
+        case '*': result = operand1 * operand2; break;
+        case '/': result = operand2 === 0 ? 'Error' : operand1 / operand2; break;
+      }
+      setDisplay(String(result));
+      setOperand1(result === 'Error' ? null : parseFloat(result));
+      setOperator(null);
+      setShouldResetDisplay(true);
+    };
+
+    const handleClear = () => {
+      setDisplay('0');
+      setOperand1(null);
+      setOperator(null);
+      setShouldResetDisplay(false);
+    };
+
+    return (
+      <div className="calculator">
+        <div className="display">{display}</div>
+        <div className="buttons">
+          <button className="clear" onClick={handleClear}>C</button>
+          <button className="operator" onClick={() => handleOperator('/')}>/</button>
+          <button className="operator" onClick={() => handleOperator('*')}>*</button>
+          <button className="operator" onClick={() => handleOperator('-')}>-</button>
+          <button onClick={() => handleDigit(7)}>7</button>
+          <button onClick={() => handleDigit(8)}>8</button>
+          <button onClick={() => handleDigit(9)}>9</button>
+          <button className="operator" onClick={() => handleOperator('+')}>+</button>
+          <button onClick={() => handleDigit(4)}>4</button>
+          <button onClick={() => handleDigit(5)}>5</button>
+          <button onClick={() => handleDigit(6)}>6</button>
+          <button onClick={() => handleDigit(1)}>1</button>
+          <button onClick={() => handleDigit(2)}>2</button>
+          <button onClick={() => handleDigit(3)}>3</button>
+          <button onClick={() => handleDigit(0)}>0</button>
+          <button onClick={() => handleDigit('.')}>.</button>
+          <button className="equal" onClick={handleEqual}>=</button>
+        </div>
+      </div>
+    );
+  }
+
+  ReactDOM.createRoot(document.getElementById('root')).render(<Calculator />);
+</script>
+</body>
+</html>
